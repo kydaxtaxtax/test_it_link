@@ -323,11 +323,13 @@ final class CarApiTest extends TestCase
 
     public function testListCarsEmptyReturns200(): void
     {
-        $response = self::$client->get('/car/list?page=2');
+        $page = 999;
+        $response = self::$client->get("/car/list?page={$page}");
 
         $this->assertSame(200, $response->getStatusCode());
         $body = json_decode($response->getBody()->getContents(), true);
-        $this->assertSame([], $body['items']);
+        $this->assertIsArray($body['items']);
+        $this->assertCount(0, $body['items']);
     }
 
     public function testListCarsReturns400WithInvalidPage(): void

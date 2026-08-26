@@ -1,4 +1,9 @@
 runtime/
 vendor/
 .env
+.env.local
+.env.*.local
 .DS_Store
+phpunit.xml
+.phpunit.result.cache
+composer.lock

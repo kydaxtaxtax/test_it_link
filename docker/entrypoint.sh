@@ -3,7 +3,7 @@ set -e
 
 echo "Waiting for postgres to be ready..."
 for i in {1..30}; do
-    if timeout 3 bash -c "cat < /dev/null > /dev/tcp/postgres/5432" 2>/dev/null; then
+    if timeout 3 bash -c "nc -z postgres 5432" 2>/dev/null; then
         echo "Postgres is ready!"
         break
     fi

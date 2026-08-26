@@ -41,14 +41,14 @@ final class CarControllerTest extends TestCase
                 return null;
             }
 
-            public function findAll(int $page, int $pageSize)
+            public function findAll(int $page, int $pageSize): \yii\data\DataProviderInterface
             {
                 $offset = ($page - 1) * $pageSize;
                 $total = count($this->cars);
                 $subset = array_slice($this->cars, $offset, $pageSize);
 
                 return new \yii\data\ArrayDataProvider([
-                    'models' => $subset,
+                    'allModels' => $subset,
                     'totalCount' => $total,
                     'pagination' => [
                         'page' => $page - 1,
@@ -310,8 +310,10 @@ final class CarControllerTest extends TestCase
     {
         $controller = new CarController('car', Yii::$app, $this->service);
 
-        $this->expectException(\yii\web\NotFoundHttpException::class);
-        $controller->actionView(9999);
+        $response = $controller->actionView(9999);
+
+        $this->assertSame(404, Yii::$app->response->statusCode);
+        $this->assertArrayHasKey('errors', $response);
     }
 
     public function testListReturns200WithPagination(): void

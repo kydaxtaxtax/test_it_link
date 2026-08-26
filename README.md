@@ -23,18 +23,27 @@ REST API сервис для управления объявлениями ав�
 
 ## Запуск через Docker
 
+> :warning: **.env в репозитории — ДЛЯ ДЕМО.** В реальном проекте .env должен быть в .gitignore и генерироваться через secrets CI/CD. Никогда не комитьте реальные секреты!
+
 ```bash
 # Сборка и запуск всех сервисов
 docker-compose up -d --build
 
-# Проверка статуса
+# Проверка статуса (все сервисы должны быть running/healthy)
 docker-compose ps
 
 # Логи
 docker-compose logs -f app
+
+# Остановка
+docker-compose down
 ```
 
 Приложение доступно по адресу: `http://localhost:80`
+
+**При первом запуске автоматически:**
+- Создаётся база данных `car_ad_db`
+- Выполняются миграции (`php yii migrate/up --interactive=0`)
 
 ## Локальный запуск (без Docker)
 
