@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 final class CarApiTest extends TestCase
 {
     private static Client $client;
-    private static string $baseUri = 'http://localhost:80';
+    private static string $baseUri = 'http://nginx:80';
 
     public static function setUpBeforeClass(): void
     {
