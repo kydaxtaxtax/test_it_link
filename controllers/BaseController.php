@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\exceptions\ValidationException;
+use app\services\CarService;
 use yii\base\Action;
 use yii\rest\Controller;
 use yii\web\HttpException;
@@ -21,6 +22,18 @@ abstract class BaseController extends Controller
     {
         parent::init();
         $this->carService = \Yii::$container->get(\app\services\CarService::class);
+    }
+
+    public function behaviors(): array
+    {
+        return [
+            'contentNegotiator' => [
+                'class' => \yii\filters\ContentNegotiator::class,
+                'formats' => [
+                    'application/json' => \yii\web\Response::FORMAT_JSON,
+                ],
+            ],
+        ];
     }
 
     /**

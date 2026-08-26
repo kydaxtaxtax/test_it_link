@@ -12,6 +12,7 @@
         "yiisoft/yii2-swiftmailer": "~2.1.0"
     },
     "require-dev": {
+        "guzzlehttp/guzzle": "^8.1",
         "phpunit/phpunit": "^9.6",
         "yiisoft/yii2-debug": "~2.1.0"
     },

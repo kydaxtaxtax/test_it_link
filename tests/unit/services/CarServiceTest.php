@@ -32,7 +32,7 @@ final class CarServiceTest extends TestCase
                 return $this->savedCar;
             }
 
-            public function findAll(int $page, int $pageSize)
+            public function findAll(int $page, int $pageSize): \yii\data\DataProviderInterface
             {
                 return new \yii\data\ArrayDataProvider([
                     'models' => [],

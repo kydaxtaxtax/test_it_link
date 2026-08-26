@@ -1,8 +1,5 @@
 FROM php:8.3-cli
 
-ARG UID=1000
-ARG GID=1000
-
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     unzip \
@@ -17,9 +14,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+RUN composer install --no-dev --optimize-autoloader --no-interaction || true
 
-RUN useradd -u $UID -g $GID -m appuser || true
+RUN useradd -m -u 1000 -s /bin/bash appuser || true
 RUN chown -R appuser:appuser /app
 
 USER appuser
@@ -27,4 +24,4 @@ USER appuser
 EXPOSE 8080
 
 ENTRYPOINT ["bash", "/app/docker/entrypoint.sh"]
-CMD ["php", "yii", "serve", "--host=0.0.0.0", "--port=8080"]
+CMD ["php", "-S", "0.0.0.0:8080", "router.php"]

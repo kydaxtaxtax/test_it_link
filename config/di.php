@@ -8,14 +8,12 @@ use app\services\CarService;
 
 /**
  * Настройка Dependency Injection контейнера Yii2.
- * Connection инжектится через фабрику, которая safely читает \Yii::$app->db
- * после инициализации приложения (избегаем рекурсии).
  */
 return [
     'definitions' => [
-        CarRepositoryInterface::class => static fn () => new CarRepository(\Yii::$app->db),
-        CarService::class => static fn (CarRepositoryInterface $repo) => new CarService(
-            $repo,
+        CarRepositoryInterface::class => CarRepository::class,
+        CarService::class => static fn () => new CarService(
+            \Yii::$container->get(CarRepositoryInterface::class),
             new \app\validation\CarCreateValidator()
         ),
     ],

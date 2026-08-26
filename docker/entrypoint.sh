@@ -2,10 +2,14 @@
 set -e
 
 echo "Waiting for postgres to be ready..."
-until PGPASSWORD=postgres psql -h postgres -U postgres -d car_ad_db -c '\q' 2>/dev/null; do
-    sleep 1
+for i in {1..30}; do
+    if timeout 3 bash -c "cat < /dev/null > /dev/tcp/postgres/5432" 2>/dev/null; then
+        echo "Postgres is ready!"
+        break
+    fi
+    echo "Attempt $i failed, retrying..."
+    sleep 2
 done
-echo "Postgres is ready!"
 
 echo "Running migrations..."
 php yii migrate/up --interactive=0

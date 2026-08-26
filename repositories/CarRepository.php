@@ -11,17 +11,13 @@ use app\models\Car;
 use app\models\CarOption;
 use yii\data\ActiveDataProvider;
 use yii\data\DataProviderInterface;
-use yii\db\Connection;
 
 /**
  * Репозиторий объявлений автомобилей (доступ к данным через DataMapper/AR).
+ * DB подключение берётся из \Yii::$app->db (компонент приложения).
  */
 final class CarRepository implements CarRepositoryInterface
 {
-    public function __construct(private readonly Connection $db)
-    {
-    }
-
     public function findById(int $id): ?CarEntity
     {
         $car = Car::find()
@@ -51,7 +47,8 @@ final class CarRepository implements CarRepositoryInterface
 
     public function saveCar(CarEntity $entity, ?CarOptionEntity $option): CarEntity
     {
-        $transaction = $this->db->beginTransaction();
+        $db = \Yii::$app->db;
+        $transaction = $db->beginTransaction();
 
         try {
             $car = new Car();
