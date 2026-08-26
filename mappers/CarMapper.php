@@ -28,7 +28,7 @@ final class CarMapper
             (float) $car->price,
             (string) $car->photo_url,
             (string) $car->contacts,
-            $car->created_at !== null ? (string) $car->created_at : null,
+            $car->created_at !== null ? self::formatTimestamp($car->created_at) : null,
             $option,
         );
     }
@@ -42,5 +42,14 @@ final class CarMapper
             (string) $option->body,
             (int) $option->mileage,
         );
+    }
+
+    private static function formatTimestamp(mixed $value): string
+    {
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format('Y-m-d H:i:s');
+        }
+
+        return (string) $value;
     }
 }

@@ -65,6 +65,8 @@ final class CarRepository implements CarRepositoryInterface
                 throw new \RuntimeException('Не удалось сохранить объявление: ' . implode('; ', $car->getFirstErrors()));
             }
 
+            $car->refresh();
+
             if ($option !== null) {
                 $carOption = new CarOption();
                 $carOption->car_id = (int) $car->id;
