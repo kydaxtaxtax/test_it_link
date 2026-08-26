@@ -11,13 +11,13 @@ return [
         'pluralize' => false,
         'patterns' => [
             'POST create' => 'create',
-            'GET list' => 'index',
             'GET <id:\d+>' => 'view',
+            'GET list' => 'index',
         ],
         'extraPatterns' => [
             'POST create' => 'create',
-            'GET list' => 'index',
             'GET <id:\d+>' => 'view',
+            'GET list' => 'index',
         ],
     ],
 ];

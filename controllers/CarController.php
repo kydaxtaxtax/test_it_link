@@ -5,7 +5,12 @@ declare(strict_types=1);
 namespace app\controllers;
 
 use app\entities\CarOptionEntity;
+use app\exceptions\ValidationException;
 use app\services\CarService;
+use app\validation\CarCreateValidator;
+use app\validation\CarListValidator;
+use app\validation\CarViewValidator;
+use yii\base\Action;
 use yii\web\BadRequestHttpException;
 
 /**
@@ -13,6 +18,18 @@ use yii\web\BadRequestHttpException;
  */
 final class CarController extends BaseController
 {
+    private CarCreateValidator $createValidator;
+    private CarViewValidator $viewValidator;
+    private CarListValidator $listValidator;
+
+    public function init(): void
+    {
+        parent::init();
+        $this->createValidator = new CarCreateValidator();
+        $this->viewValidator = new CarViewValidator();
+        $this->listValidator = new CarListValidator();
+    }
+
     /**
      * POST /car/create
      */
@@ -20,10 +37,17 @@ final class CarController extends BaseController
     {
         $body = $this->getBody();
 
+        $errors = $this->createValidator->validate($body);
+        if ($errors !== []) {
+            $this->response->setStatusCode(422, 'Unprocessable Entity');
+            return $this->errorResponse(422, 'Validation Error', $errors);
+        }
+
         try {
             $car = $this->carService->create($body);
-        } catch (\app\exceptions\ValidationException $e) {
-            return $this->errorResponse(422, 'Unprocessable Entity', $e->getFieldErrors());
+        } catch (ValidationException $e) {
+            $this->response->setStatusCode(422, 'Unprocessable Entity');
+            return $this->errorResponse(422, 'Validation Error', $e->getFieldErrors());
         }
 
         return $this->createdResponse($car->toArray());
@@ -32,12 +56,19 @@ final class CarController extends BaseController
     /**
      * GET /car/{id}
      */
-    public function actionView(int $id): array
+    public function actionView(int|string|null $id): array
     {
-        $car = $this->carService->findById($id);
+        $errors = $this->viewValidator->validate(['id' => $id]);
+        if ($errors !== []) {
+            $this->response->setStatusCode(404, 'Not Found');
+            return $this->errorResponse(404, 'Not Found', $errors);
+        }
+
+        $car = $this->carService->findById((int) $id);
 
         if ($car === null) {
-            throw new \yii\web\NotFoundHttpException('Объявление не найдено.');
+            $this->response->setStatusCode(404, 'Not Found');
+            return $this->errorResponse(404, 'Not Found', ['id' => ['Объявление не найдено.']]);
         }
 
         return $this->okResponse($car->toArray());
@@ -46,11 +77,26 @@ final class CarController extends BaseController
     /**
      * GET /car/list
      */
-    public function actionIndex(int $page = 1): array
+    public function actionIndex(int|string|null $page = 1, int|string|null $pageSize = null): array
     {
-        $pageSize = (int) (\Yii::$app->params['paginationPageSize'] ?? 20);
+        $params = [];
+        if ($page !== null) {
+            $params['page'] = $page;
+        }
+        if ($pageSize !== null) {
+            $params['pageSize'] = $pageSize;
+        }
 
-        $provider = $this->carService->findAll($page, $pageSize);
+        $errors = $this->listValidator->validate($params);
+        if ($errors !== []) {
+            $this->response->setStatusCode(400, 'Bad Request');
+            return $this->errorResponse(400, 'Bad Request', $errors);
+        }
+
+        $effectivePage = $page !== null && is_numeric($page) ? (int) $page : 1;
+        $effectivePageSize = $pageSize !== null && is_numeric($pageSize) ? (int) $pageSize : (int) (\Yii::$app->params['paginationPageSize'] ?? 20);
+
+        $provider = $this->carService->findAll($effectivePage, $effectivePageSize);
 
         $items = [];
         foreach ($provider->getModels() as $car) {
@@ -78,7 +124,7 @@ final class CarController extends BaseController
         $body = \Yii::$app->request->getBodyParams();
 
         if (!is_array($body)) {
-            throw new BadRequestHttpException('Некорректное тело запроса.');
+            throw new BadRequestHttpException('Некорректное тело запроса. Ожидался JSON объект.');
         }
 
         return $body;
