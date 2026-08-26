@@ -45,6 +45,19 @@ docker-compose down
 - Создаётся база данных `car_ad_db`
 - Выполняются миграции (`php yii migrate/up --interactive=0`)
 
+## Тесты
+
+```bash
+# Запуск всех тестов в контейнере
+docker compose exec app php /app/vendor/bin/phpunit
+
+# Только unit тесты
+docker compose exec app php /app/vendor/bin/phpunit tests/unit
+
+# Только API тесты (требуют запущенный сервер)
+docker compose exec app php /app/vendor/bin/phpunit tests/api
+```
+
 ## Локальный запуск (без Docker)
 
 ### Требования

@@ -47,6 +47,7 @@ services:
       - ./web:/app/web:ro
       - ./router.php:/app/router.php:ro
       - ./yii:/app/yii:ro
+      - ./phpunit.xml:/app/phpunit.xml:ro
 
   nginx:
     image: nginx:alpine
